@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from 'jsonwebtoken';
 import User from '../models/user.js';
+import validator from 'validator'; //esto hara que sea necesario el formato indicado del correo
 
 export const register = (req, res) => {
   const { name, email, password, role = 'user'} = req.body;
@@ -14,13 +15,17 @@ export const register = (req, res) => {
     return res.status(400).json({ message: 'Todos los campos son requeridos' });
   }
 
+  if (!validator.isEmail(email)) {
+    return res.status(400).json({ message: 'El formato del correo electrónico no es válido' });
+  }//validar el dffotmato
+
   bcrypt.hash(password, 10, (err, hashedPassword) => {
     if (err) return res.status(500).json({ message: 'Error en la encriptación' });
 
     User.create({ name, email, password: hashedPassword }, (err, result) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ message: 'Error al registrar usuario' });
+      if (err)//eviar la duplicacion del correo
+        if (err.code === 'ER_DUP_ENTRY' && err.sqlMessage.includes('email')) {
+        return res.status(409).json({ message: 'Este correo electrónico ya está registrado' });
       }
       res.status(201).json({ message: 'Usuario registrado exitosamente' });
     });

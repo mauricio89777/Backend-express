@@ -1,6 +1,13 @@
 import mysql from 'mysql2/promise';
 import { dbConfig } from '../config/db.js';
 
+
+
+// Función auxiliar para obtener una conexión
+const getConnection = async () => {
+  return await mysql.createConnection(dbConfig);
+};
+
 class User {
   // Crear usuario
   static async create(userData) {
@@ -71,3 +78,5 @@ class User {
 }
 
 export default User;
+
+
