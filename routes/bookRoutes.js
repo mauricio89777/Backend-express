@@ -8,16 +8,19 @@ import {
   getBooksByCategory
 } from '../controllers/bookController.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
-import { adminMiddleware } from '../middlewares/adminMiddleware.js';
+import { adminMiddleware } from '../middlewares/adminMiddleware.js'; // Cambia esto si usas export default
+
 const router = express.Router();
 
-// Rutas protegidas (requieren autenticación)
+// Rutas públicas
 router.get('/', getAllBooks);
 router.get('/:id', getBookById);
-router.put('/:id', authMiddleware, updateBook);
 router.get('/category/:categoryId', getBooksByCategory);
 
-//rutas de admins
+// Rutas protegidas para usuarios autenticados
+router.put('/:id', authMiddleware, updateBook);
+
+// Rutas exclusivas para administradores
 router.post('/', authMiddleware, adminMiddleware, createBook);
 router.delete('/:id', authMiddleware, adminMiddleware, deleteBook);
 

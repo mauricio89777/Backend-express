@@ -1,19 +1,26 @@
 import jwt from 'jsonwebtoken';
 
 export const authMiddleware = (req, res, next) => {
-  // Obtener el token del header
-  const token = req.header('Authorization')?.replace('Bearer ', '');
+  const authHeader = req.headers['authorization'];
+
+  // Formato esperado: "Bearer token"
+  const token = authHeader && authHeader.split(' ')[1];
 
   if (!token) {
-    return res.status(401).json({ message: 'Acceso denegado. No hay token proporcionado.' });
+    return res.status(401).json({ message: 'Token no proporcionado' });
   }
 
-  try {
-    // Verificar el token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // Añadir el payload decodificado a la request
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(403).json({ message: 'Token inválido o expirado' });
+    }
+
+    req.user = {
+      id: decoded.userId,
+      email: decoded.email,
+      role: decoded.role
+    };
+
     next();
-  } catch (err) {
-    res.status(400).json({ message: 'Token inválido.' });
-  }
+  });
 };

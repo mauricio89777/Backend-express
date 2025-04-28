@@ -1,37 +1,58 @@
 import mysql from 'mysql2/promise';
 import { dbConfig } from '../config/db.js';
 
-
-
 // Función auxiliar para obtener una conexión
 const getConnection = async () => {
-  return await mysql.createConnection(dbConfig);
+  return mysql.createConnection(dbConfig);
 };
 
 class User {
   // Crear usuario
-  static async create(userData) {
-    const connection = await mysql.createConnection(dbConfig);
+  static async create({ name, email, password, role = 'usuario' }) {
+    const connection = await getConnection();
     try {
       const [result] = await connection.execute(
-        'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
-        [userData.name, userData.email, userData.password]
+        'INSERT INTO usuarios (name, email, password, role) VALUES (?, ?, ?, ?)',
+        [name, email, password, role]
       );
       return result.insertId;
+    } catch (error) {
+      console.error('Error al crear usuario:', error);
+      throw error;
     } finally {
       await connection.end();
     }
   }
 
-
-  //ver rol de administrador
-  static async promoteToAdmin(userId) {
-    const connection = await mysql.createConnection(dbConfig);
+  // Actualizar token
+  static async updateToken(userId, token) {
+    const connection = await getConnection();
     try {
-      await connection.execute(
-        'UPDATE users SET role = "admin" WHERE id = ?',
+      const [result] = await connection.execute(
+        'UPDATE usuarios SET token = ? WHERE id = ?',
+        [token, userId]
+      );
+      return result.affectedRows;
+    } catch (error) {
+      console.error('Error al actualizar token:', error);
+      throw error;
+    } finally {
+      await connection.end();
+    }
+  }
+
+  // Promover a administrador
+  static async promoteToAdmin(userId) {
+    const connection = await getConnection();
+    try {
+      const [result] = await connection.execute(
+        'UPDATE usuarios SET role = "admin" WHERE id = ?',
         [userId]
       );
+      return result.affectedRows;
+    } catch (error) {
+      console.error('Error al promover a admin:', error);
+      throw error;
     } finally {
       await connection.end();
     }
@@ -39,13 +60,16 @@ class User {
 
   // Buscar por email
   static async findByEmail(email) {
-    const connection = await mysql.createConnection(dbConfig);
+    const connection = await getConnection();
     try {
       const [rows] = await connection.execute(
-        'SELECT * FROM users WHERE email = ?',
+        'SELECT * FROM usuarios WHERE email = ?',
         [email]
       );
-      return rows;
+      return rows[0] || null; // Mejor si no encuentra, devolver null explícitamente
+    } catch (error) {
+      console.error('Error al buscar por email:', error);
+      throw error;
     } finally {
       await connection.end();
     }
@@ -53,24 +77,66 @@ class User {
 
   // Obtener todos los usuarios
   static async findAll() {
-    const connection = await mysql.createConnection(dbConfig);
+    const connection = await getConnection();
     try {
-      const [rows] = await connection.execute('SELECT id, name, email FROM users');
+      const [rows] = await connection.execute(
+        'SELECT id, name, email, role, created_at, updated_at FROM usuarios'
+      );
       return rows;
+    } catch (error) {
+      console.error('Error al obtener usuarios:', error);
+      throw error;
     } finally {
       await connection.end();
     }
   }
 
-  // Obtener usuario por ID
+  // Buscar por ID
   static async findById(id) {
-    const connection = await mysql.createConnection(dbConfig);
+    const connection = await getConnection();
     try {
       const [rows] = await connection.execute(
-        'SELECT id, name, email FROM users WHERE id = ?',
+        'SELECT * FROM usuarios WHERE id = ?',
         [id]
       );
-      return rows[0];
+      return rows[0] || null;
+    } catch (error) {
+      console.error('Error al buscar por ID:', error);
+      throw error;
+    } finally {
+      await connection.end();
+    }
+  }
+
+  // Actualizar usuario
+  static async update(id, { name, email }) {
+    const connection = await getConnection();
+    try {
+      const [result] = await connection.execute(
+        'UPDATE usuarios SET name = ?, email = ? WHERE id = ?',
+        [name, email, id]
+      );
+      return result.affectedRows;
+    } catch (error) {
+      console.error('Error al actualizar usuario:', error);
+      throw error;
+    } finally {
+      await connection.end();
+    }
+  }
+
+  // Eliminar usuario
+  static async delete(id) {
+    const connection = await getConnection();
+    try {
+      const [result] = await connection.execute(
+        'DELETE FROM usuarios WHERE id = ?',
+        [id]
+      );
+      return result.affectedRows;
+    } catch (error) {
+      console.error('Error al eliminar usuario:', error);
+      throw error;
     } finally {
       await connection.end();
     }
@@ -78,5 +144,3 @@ class User {
 }
 
 export default User;
-
-
