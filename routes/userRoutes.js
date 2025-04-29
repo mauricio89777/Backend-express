@@ -1,5 +1,5 @@
 import express from 'express';
-import { register, login, getAllUsers, promoteToAdmin,createAdminUser } from '../controllers/userController.js';
+import { register, login, getAllUsers, promoteToAdmin,createAdminUser, updateUser ,deleteUser } from '../controllers/userController.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 import { adminMiddleware } from '../middlewares/adminMiddleware.js';
 
@@ -18,4 +18,8 @@ router.get('/users', authMiddleware, getAllUsers);
 router.patch('/:userId/promote', authMiddleware, adminMiddleware, promoteToAdmin);
 
 router.post('/create-admin', createAdminUser);
+
+router.put('/:id', updateUser); // Actualizar usuario
+router.delete('/:id', deleteUser); // Eliminar usuario
+
 export default router;
