@@ -4,7 +4,7 @@ import User from '../models/user.js';
 import validator from 'validator';
 
 
-//crerar usurario
+//crerar usurario admin
 export const createAdminUser = async (req, res) => {
   const { email, password } = req.body;
 
@@ -34,7 +34,7 @@ export const createAdminUser = async (req, res) => {
 
 // Registrar usuario comun
 export const register = async (req, res) => {
-  const { name, email, password, role = 'user' } = req.body;
+  const { name, email, password, role = 'usuario' } = req.body;
 
   // Solo admins pueden crear otros admins
   if (role === 'admin' && (!req.user || req.user.role !== 'admin')) {
@@ -108,7 +108,7 @@ export const login = async (req, res) => {
   }
 };
 
-// Obtener todos los usuarios-------requiere se probada
+// Obtener todos los usuarios
 export const getAllUsers = async (req, res) => {
   try {
     const users = await User.findAll();
@@ -133,7 +133,7 @@ export const promoteToAdmin = async (req, res) => {
   }
 };
 
-// Actualizar usuario no los tengo en la ruta debo de hacerlo
+// Actualizar usuario
 export const updateUser = async (req, res) => {
   try {
     const updated = await User.update(req.params.id, req.body);
@@ -158,5 +158,38 @@ export const deleteUser = async (req, res) => {
   } catch (error) {
     console.error('Error al eliminar usuario:', error);
     res.status(500).json({ message: 'Error al eliminar usuario' });
+  }
+};
+
+
+export const getUserById = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+};
+
+export const getUserByEmail = async (req, res) => {
+  try {
+    const user = await User.findByEmail(req.params.email);
+    if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+};
+
+export const updateUserToken = async (req, res) => {
+  const { id } = req.params;
+  const { token } = req.body;
+  try {
+    const updated = await User.updateToken(id, token);
+    if (updated === 0) return res.status(404).json({ message: 'Usuario no encontrado' });
+    res.json({ message: 'Token actualizado' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error del servidor' });
   }
 };

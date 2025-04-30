@@ -73,7 +73,7 @@ class User {
     }
   }
 
-  // Buscar por ID
+  // Buscar por ID 
   static async findById(id) {
     try {
       const [rows] = await pool.query(
