@@ -74,3 +74,39 @@ export const getBooksByCategory = async (req, res) => {
     res.status(500).json({ message: 'Error al obtener libros por categoría' });
   }
 };
+
+
+export const getBooksByAuthor = async (req, res) => {
+  try {
+    const authorId = parseInt(req.params.authorId);
+    
+    if (isNaN(authorId)) {
+      return res.status(400).json({ 
+        message: 'El ID del autor debe ser un número válido' 
+      });
+    }
+
+    const books = await Book.findByAuthor(authorId);
+    if (books.length === 0) {
+      const [author] = await pool.query('SELECT id FROM autores WHERE id = ?', [authorId]);
+      if (author.length === 0) {
+        return res.status(404).json({ 
+          message: 'El autor especificado no existe' 
+        });
+      }
+      
+      return res.status(200).json({ 
+        message: 'Este autor no tiene libros registrados',
+        books: [] 
+      });
+    }
+
+    res.status(200).json(books);
+  } catch (error) {
+    console.error('Error en getBooksByAuthor:', error);
+    res.status(500).json({ 
+      message: 'Error al buscar libros por autor',
+      error: error.message 
+    });
+  }
+};
