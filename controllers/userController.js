@@ -4,7 +4,7 @@ import User from '../models/user.js';
 import validator from 'validator';
 
 
-//crerar usurario
+//crerar usurario admin
 export const createAdminUser = async (req, res) => {
   const { email, password } = req.body;
 
@@ -34,7 +34,7 @@ export const createAdminUser = async (req, res) => {
 
 // Registrar usuario comun
 export const register = async (req, res) => {
-  const { name, email, password, role = 'user' } = req.body;
+  const { name, email, password, role = 'usuario' } = req.body;
 
   // Solo admins pueden crear otros admins
   if (role === 'admin' && (!req.user || req.user.role !== 'admin')) {

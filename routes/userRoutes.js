@@ -8,7 +8,7 @@ const router = express.Router();
 // Registro de usuario
 router.post('/register', register);
 
-// Inicio de sesión
+// Inicio de sesión (probar usuario comun)
 router.post('/login', login);
 
 // Obtener todos los usuarios (protegido por autenticación)
