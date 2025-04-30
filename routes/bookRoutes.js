@@ -5,7 +5,8 @@ import {
   getBookById, 
   updateBook, 
   deleteBook,
-  getBooksByCategory
+  getBooksByCategory,
+  getBooksByAuthor,
 } from '../controllers/bookController.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 import { adminMiddleware } from '../middlewares/adminMiddleware.js';
@@ -14,6 +15,7 @@ const router = express.Router();
 
 router.get('/', getAllBooks);
 router.get('/category/:categoryId', getBooksByCategory);
+router.get('/author/:authorId', getBooksByAuthor);
 router.get('/:id', getBookById);
 
 // Rutas protegidas para usuarios autenticados
