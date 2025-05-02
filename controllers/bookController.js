@@ -1,6 +1,5 @@
 import Book from '../models/book.js';
 
-// Crear un nuevo libro
 export const createBook = async (req, res) => {
   try {
     const bookId = await Book.create(req.body);
@@ -37,6 +36,8 @@ export const getBookById = async (req, res) => {
 };
 
 // Actualizar un libro
+
+
 export const updateBook = async (req, res) => {
   try {
     const affectedRows = await Book.update(req.params.id, req.body);
@@ -49,6 +50,8 @@ export const updateBook = async (req, res) => {
     res.status(500).json({ message: 'Error al actualizar el libro' });
   }
 };
+
+
 
 // Eliminar un libro
 export const deleteBook = async (req, res) => {

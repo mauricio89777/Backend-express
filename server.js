@@ -22,7 +22,15 @@ app.use('/api/users', userRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/books', bookRoutes);
 
+app.get('/', (req, res) => {
+    res.send('API funcionando');
+  });
 
+app.use((err, req, res, next) => {
+console.error(err.stack);
+res.status(500).json({ message: 'Error interno del servidor' });
+});
+  
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));
