@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import userRoutes from './routes/userRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import bookRoutes from './routes/bookRoutes.js';
+import paypalRoutes from './routes/paypalRoute.js';
 import { connectDB } from './config/db.js';
 
 // Inicializar
@@ -21,6 +22,9 @@ connectDB();
 app.use('/api/users', userRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/books', bookRoutes);
+
+app.use('/api/paypal', paypalRoutes);
+
 
 app.get('/', (req, res) => {
     res.send('API funcionando');
